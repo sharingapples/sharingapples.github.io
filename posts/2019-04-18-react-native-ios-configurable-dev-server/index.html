@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en-us">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Configurable Development Server for iOS in React Native - SharingApples</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="Change your react-native development server in iOS devices on the fly">
+	
+	
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+		
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="SharingApples" rel="home">
+				<div class="logo__title">SharingApples</div>
+				
+			</a>
+		</div>
+		<div class="divider"></div>
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Configurable Development Server for iOS in React Native</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
+	<time class="meta__text" datetime="2019-04-18T00:00:00">April 18, 2019</time>
+</div>
+</div>
+		</header>
+<div class="post__toc toc">
+	<div class="toc__title">Page content</div>
+	<div class="toc__menu">
+		<nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#1-create-configuration-form-that-appears-on-the-settings-app">1. Create configuration form that appears on the Settings app</a></li>
+<li><a href="#2-create-bundle-url-from-settings-configuration">2. Create bundle URL from settings configuration</a></li>
+<li><a href="#3-avoid-the-settings-configuration-in-release-mode">3. Avoid the settings configuration in Release Mode</a></li>
+</ul></li>
+</ul>
+</nav>
+	</div>
+</div>
+<div class="content post__content clearfix">
+			
+
+<p>The android apps built on react-native provide an easy way to change the development server via
+development menu (Shake Menu). The same option is not available for iOS when it comes to testing
+the app on physical devices. With few changes to your ios project, you would be able to achieve
+this functionality.</p>
+
+<p>iOS provides a way to change configurations for the app via its <strong>Settings</strong> app. You could add
+configurations options that appears on this settings page. You could change this configuration
+which are read by the app on startup.</p>
+
+<h2 id="1-create-configuration-form-that-appears-on-the-settings-app">1. Create configuration form that appears on the Settings app</h2>
+
+<ul>
+<li>Open your ios project or workspace in XCode</li>
+<li>Add a new <code>Settings.bundle</code> with <strong>New file..</strong> option.</li>
+<li>Use this <a href="Root.plist">Root.plist file</a> to replace the <code>Settings.bundle/Root.plist</code> in iOS folder.
+Or open the <code>Settings.bundle/Root.plist</code> file with XCode and Include:
+
+<ol>
+<li><strong>Text Field</strong> with Identifier <code>server</code></li>
+<li><strong>Toggle Switch</strong> with Identifier <code>production</code></li>
+<li><strong>Toggle Switch</strong> with Identifier <code>minifed</code></li>
+</ol></li>
+</ul>
+
+<h2 id="2-create-bundle-url-from-settings-configuration">2. Create bundle URL from settings configuration</h2>
+
+<p>Edit the <code>AppDelegate.m</code> in your iOS project to read the configuration and generate bundle URL
+in debug mode.</p>
+
+<p>Depending upon the react-native version, you will either have to return the bundle url from
+<code>sourceURLForBridge</code> function (react-native &gt;= 0.59) or set the value for <code>jsCodeLocation</code>
+(react-native &lt; 0.59).</p>
+
+<ul>
+<li>For react-native &gt;= 0.59, change the sourceURLForBridge function to</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c">- (NSURL <span style="color:#f92672">*</span>)<span style="color:#a6e22e">sourceURLForBridge:</span>(RCTBridge <span style="color:#f92672">*</span>)bridge
+{
+<span style="color:#75715e">#if DEBUG
+</span><span style="color:#75715e"></span>  NSUserDefaults <span style="color:#f92672">*</span>defaults <span style="color:#f92672">=</span> [NSUserDefaults standardUserDefaults];
+  NSString <span style="color:#f92672">*</span>server <span style="color:#f92672">=</span> [defaults stringForKey:<span style="color:#e6db74">@&#34;server&#34;</span>];
+  <span style="color:#66d9ef">BOOL</span> production <span style="color:#f92672">=</span> [defaults boolForKey:<span style="color:#e6db74">@&#34;production&#34;</span>];
+  <span style="color:#66d9ef">BOOL</span> minified <span style="color:#f92672">=</span> [defaults boolForKey:<span style="color:#e6db74">@&#34;minified&#34;</span>];
+
+  <span style="color:#66d9ef">if</span> (server <span style="color:#f92672">==</span> NULL) server <span style="color:#f92672">=</span> <span style="color:#e6db74">@&#34;localhost:8081&#34;</span>;
+  NSString <span style="color:#f92672">*</span>url <span style="color:#f92672">=</span> [NSString stringWithFormat:<span style="color:#e6db74">@&#34;http://%@/index.bundle?platform=ios&amp;dev=%@&amp;minify=%@&#34;</span>, server, production <span style="color:#f92672">?</span> <span style="color:#e6db74">@&#34;false&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">@&#34;true&#34;</span>, minified <span style="color:#f92672">?</span> <span style="color:#e6db74">@&#34;true&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">@&#34;false&#34;</span>];
+
+  <span style="color:#66d9ef">return</span> [NSURL URLWithString:url];
+<span style="color:#75715e">#else
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> [[NSBundle mainBundle] URLForResource:<span style="color:#e6db74">@&#34;main&#34;</span> withExtension:<span style="color:#e6db74">@&#34;jsbundle&#34;</span>];
+<span style="color:#75715e">#endif
+</span><span style="color:#75715e"></span>}</code></pre></div>
+<ul>
+<li>For react-native &lt; 59, change the jsCodeLocation retrieval part to</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="color:#75715e">#ifdef DEBUG
+</span><span style="color:#75715e"></span>  NSUserDefaults <span style="color:#f92672">*</span>defaults <span style="color:#f92672">=</span> [NSUserDefaults standardUserDefaults];
+  NSString <span style="color:#f92672">*</span>server <span style="color:#f92672">=</span> [defaults stringForKey:<span style="color:#e6db74">@&#34;server&#34;</span>];
+  <span style="color:#66d9ef">BOOL</span> production <span style="color:#f92672">=</span> [defaults boolForKey:<span style="color:#e6db74">@&#34;production&#34;</span>];
+  <span style="color:#66d9ef">BOOL</span> minified <span style="color:#f92672">=</span> [defaults boolForKey:<span style="color:#e6db74">@&#34;minified&#34;</span>];
+
+  <span style="color:#66d9ef">if</span> (server <span style="color:#f92672">==</span> NULL) server <span style="color:#f92672">=</span> <span style="color:#e6db74">@&#34;localhost:8081&#34;</span>;
+  NSString <span style="color:#f92672">*</span>url <span style="color:#f92672">=</span> [NSString stringWithFormat:<span style="color:#e6db74">@&#34;http://%@/index.bundle?platform=ios&amp;dev=%@&amp;minify=%@&#34;</span>, server, production <span style="color:#f92672">?</span> <span style="color:#e6db74">@&#34;false&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">@&#34;true&#34;</span>, minified <span style="color:#f92672">?</span> <span style="color:#e6db74">@&#34;true&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">@&#34;false&#34;</span>];
+
+  jsCodeLocation <span style="color:#f92672">=</span> [NSURL URLWithString:url];
+<span style="color:#75715e">#else
+</span><span style="color:#75715e"></span>  jsCodeLocation <span style="color:#f92672">=</span> [[NSBundle mainBundle] URLForResource:<span style="color:#e6db74">@&#34;main&#34;</span> withExtension:<span style="color:#e6db74">@&#34;jsbundle&#34;</span>];
+<span style="color:#75715e">#endif</span></code></pre></div>
+<h2 id="3-avoid-the-settings-configuration-in-release-mode">3. Avoid the settings configuration in Release Mode</h2>
+
+<p>You would not want to ship your app with the development configuration, even if it is not being
+used. So, make sure that the <code>Settings.bundle</code> is included in your app in Debug mode only.</p>
+
+<ul>
+<li>Open the <code>Build Phases</code> of your app</li>
+<li>You should see <code>Settings.bundle</code> listed under <strong>Copy Bundle Resources</strong>. Remove it from there</li>
+<li>Add a <strong>New Run Script Phase</strong> and drag it to run before the <strong>Copy Bundle Resource</strong>. You can
+rename the new phase to something like <code>Development Server Configuration</code>, and use the following
+shell script to copy the bundle in debug mode only</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>CONFIGURATION<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Debug&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+  cp -r <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>PROJECT_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">/Settings.bundle&#34;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>BUILT_PRODUCTS_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>PRODUCT_NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">.app/Settings.bundle&#34;</span>
+<span style="color:#66d9ef">fi</span></code></pre></div>
+<p>That&rsquo;s it. Three easy steps and you should now be able to change your development server, and also
+modify the development and minified flag for bundle generation, without building your app.</p>
+
+<p>You should see the configuration options under <strong>iOS Settings</strong> &gt; <strong>[Your App Name]</strong>.
+And you will have to restart your app for the changes to take affect.</p>
+
+		</div>
+		
+<div class="post__tags tags clearfix">
+	<svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5 0 11V3C0 1.5.8.8.8.8S1.5 0 3 0h8c1.5 0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
+	<ul class="tags__list">
+		<li class="tags__item"><a class="tags__link btn" href="/tags/react-native/" rel="tag">React Native</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/tags/ios/" rel="tag">iOS</a></li>
+	</ul>
+</div>
+	</article>
+</main>
+
+
+
+
+			</div>
+			<aside class="sidebar">
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/posts/2019-04-18-react-native-ios-configurable-dev-server/">Configurable Development Server for iOS in React Native</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/categories/react-native">React native</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-taglist widget">
+	<h4 class="widget__title">Tags</h4>
+	<div class="widget__content">
+		<a class="widget-taglist__link widget__link btn" href="/tags/ios" title="Ios">Ios</a>
+		<a class="widget-taglist__link widget__link btn" href="/tags/react-native" title="React native">React native</a>
+	</div>
+</div>
+<div class="widget-social widget">
+	<h4 class="widget-social__title widget__title">Social</h4>
+	<div class="widget-social__content widget__content">
+		<div class="widget-social__item widget__item">
+			<a class="widget-social__link widget__link btn" title="GitHub" rel="noopener noreferrer" href="https://github.com/sharingapples" target="_blank">
+				<svg class="widget-social__link-icon icon icon-github" width="24" height="24" viewBox="0 0 384 374"><path d="m192 0c-106.1 0-192 85.8-192 191.7 0 84.7 55 156.6 131.3 181.9 9.6 1.8 13.1-4.2 13.1-9.2 0-4.6-.2-16.6-.3-32.6-53.4 11.6-64.7-25.7-64.7-25.7-8.7-22.1-21.3-28-21.3-28-17.4-11.9 1.3-11.6 1.3-11.6 19.3 1.4 29.4 19.8 29.4 19.8 17.1 29.3 44.9 20.8 55.9 15.9 1.7-12.4 6.7-20.8 12.2-25.6-42.6-4.8-87.5-21.3-87.5-94.8 0-20.9 7.5-38 19.8-51.4-2-4.9-8.6-24.3 1.9-50.7 0 0 16.1-5.2 52.8 19.7 15.3-4.2 31.7-6.4 48.1-6.5 16.3.1 32.7 2.2 48.1 6.5 36.7-24.8 52.8-19.7 52.8-19.7 10.5 26.4 3.9 45.9 1.9 50.7 12.3 13.4 19.7 30.5 19.7 51.4 0 73.7-44.9 89.9-87.7 94.6 6.9 5.9 13 17.6 13 35.5 0 25.6-.2 46.3-.2 52.6 0 5.1 3.5 11.1 13.2 9.2 76.2-25.5 131.2-97.3 131.2-182 0-105.9-86-191.7-192-191.7z"/></svg>
+				<span>GitHub</span>
+			</a>
+		</div>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2019 SharingApples.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script></body>
+</html>
