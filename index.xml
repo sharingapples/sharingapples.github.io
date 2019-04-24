@@ -6,10 +6,19 @@
     <description>Recent content on SharingApples</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 18 Apr 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 24 Apr 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Curated list of pitfalls in React Native</title>
+      <link>/posts/2019-04-24-react-native-pitfalls/</link>
+      <pubDate>Wed, 24 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/2019-04-24-react-native-pitfalls/</guid>
+      <description>A list of common pitfalls in react-native and inconsistency between android and ios</description>
+    </item>
     
     <item>
       <title>Configurable Development Server for iOS in React Native</title>
