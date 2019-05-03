@@ -52,6 +52,7 @@
 <li>
 <ul>
 <li><a href="#1-zindex-android-issues">1. zIndex android issues</a></li>
+<li><a href="#2-text-layout-calculation-with-font-weight">2. Text Layout Calculation with Font Weight</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -82,6 +83,18 @@ on zIndex.</p>
 are not collapsable. Which can be done by adding various
 styles <code>backgroundColor</code>, <code>border</code>, etc that requires the view
 to be drawn, or by adding <code>collapsable={false}</code>. <a href="https://facebook.github.io/react-native/docs/view#collapsable">Read more about it</a>.</p>
+
+<h2 id="2-text-layout-calculation-with-font-weight">2. Text Layout Calculation with Font Weight</h2>
+
+<p>With certain android phones like One Plus and Oppo, that
+provide their own system font, React Native fails to
+display the entire text (looks like a miscalculated width)
+when <code>font-weight</code> property is set. To resolve, use standard
+fonts like <strong>Roboto</strong>.</p>
+
+<p>The problem has issue reports (no resolution yet).
+1. <a href="https://github.com/facebook/react-native/issues/21729">https://github.com/facebook/react-native/issues/21729</a>
+2. <a href="https://github.com/facebook/react-native/issues/15114">https://github.com/facebook/react-native/issues/15114</a></p>
 
 		</div>
 		
