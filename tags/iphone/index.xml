@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>iPhone on SharingApples</title>
+    <link>/tags/iphone/</link>
+    <description>Recent content in iPhone on SharingApples</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 16 Jun 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/iphone/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Developer Tips</title>
+      <link>/posts/2019-06-16-developer-tips/</link>
+      <pubDate>Sun, 16 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/2019-06-16-developer-tips/</guid>
+      <description>Commands and tips for developers (mac)</description>
+    </item>
+    
+  </channel>
+</rss>
